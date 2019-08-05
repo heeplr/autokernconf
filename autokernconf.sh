@@ -50,11 +50,26 @@
 
 CONF_AUTO=config.auto
 AUTO_KAC=kdetect.list
+LKDDB_URL="https://cateee.net/sources/lkddb/lkddb.list"
 
 IFSorig="$IFS"
 LANG=C
 
 Null=/dev/null
+
+if ! [ -f "$AUTO_KAC" ] ; then
+    echo "$AUTO_KAC not found. please run ./kdetect.sh first."
+    exit 1
+fi
+
+if ! [ -f lkddb.list ] ; then
+    echo "lkddb.list not found"
+    # try to download
+    if [ -n "$(which wget)" ] ; then
+        wget "$LKDDB_URL" || exit 1
+    fi
+fi
+
 echo "#" > $CONF_AUTO
 echo "# Automagically generated file. Do not edit!" >> $CONF_AUTO
 echo "# (autoprobe v1.5)" >> $CONF_AUTO

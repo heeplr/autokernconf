@@ -374,6 +374,7 @@ parse_kdetect_list () {
 
 lkddb () {
    [ "$1" = "pci"       ] && ( shift; pci	"$@" ; return )
+   [ "$1" = "pci_epf"   ] && ( shift; pci_epf   "$@" ; return )
    [ "$1" = "usb"       ] && ( shift; usb	"$@" ; return )
    [ "$1" = "ieee1394"  ] && ( shift; ieee1394	"$@" ; return )
    [ "$1" = "ccw"       ] && ( shift; ccw	"$@" ; return )
@@ -384,6 +385,25 @@ lkddb () {
    [ "$1" = "platform"  ] && ( shift; platform  "$@" ; return )
    [ "$1" = "fs"   	] && ( shift; fs 	"$@" ; return )
    [ "$1" = "module"    ] && ( shift; module    "$@" ; return )
+   [ "$1" = "hid"       ] && ( shift; hid       "$@" ; return )
+   [ "$1" = "hda"       ] && ( shift; hda       "$@" ; return )
+   [ "$1" = "i2c"       ] && ( shift; i2c       "$@" ; return )
+   [ "$1" = "eisa"      ] && ( shift; eisa      "$@" ; return )
+   [ "$1" = "bcma"      ] && ( shift; bcma      "$@" ; return )
+   [ "$1" = "input"     ] && ( shift; input     "$@" ; return )
+   [ "$1" = "i2c-snd"   ] && ( shift; i2c-snd   "$@" ; return )
+   [ "$1" = "parisc"    ] && ( shift; parisc    "$@" ; return )
+   [ "$1" = "pcmcia"    ] && ( shift; pcmcia    "$@" ; return )
+   [ "$1" = "of"        ] && ( shift; of        "$@" ; return )
+   [ "$1" = "spi"       ] && ( shift; spi       "$@" ; return )
+   [ "$1" = "vio"       ] && ( shift; vio       "$@" ; return )
+   [ "$1" = "virtio"    ] && ( shift; virtio    "$@" ; return )
+   [ "$1" = "ssb"       ] && ( shift; ssb       "$@" ; return )
+   [ "$1" = "sdio"      ] && ( shift; sdio      "$@" ; return )
+   [ "$1" = "tc"        ] && ( shift; tc        "$@" ; return )
+   [ "$1" = "zorro"     ] && ( shift; zorro     "$@" ; return )
+   [ "$1" = "rpmsg"     ] && ( shift; rpmsg     "$@" ; return )
+   [ "$1" = "slim"      ] && ( shift; slim      "$@" ; return )
 }
 parse_kdetect_list
 

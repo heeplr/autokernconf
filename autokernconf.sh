@@ -110,7 +110,7 @@ raw_found () {
 }
 
 found () {
-    for conf in $(echo "$@" | sed -ne 's/^.*[ \t]*:: \(.*\)[ \t]*:: .*$/\1/p' - ) ; do
+    for conf in $(echo "$@" | sed -ne 's/^.*:[ \t]*\(.*\)*[ \t]*:.*$/\1/p' - ) ; do
         if [ "$conf" == "CONFIG__UNKNOW__" ]; then
             echo "# $@" >> $CONF_AUTO
 	elif [ "$(eval echo \$$conf)" != "y" ]; then
@@ -160,9 +160,133 @@ if grep -sqi '^pci [0-9]' $AUTO_KAC; then
     found CONFIG_PCI
 fi
 
+hid () {
+    if grep -sqe "^hid $1 $2 $3" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+hda () {
+    if grep -sqe "^hda $1 $2" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+i2c () {
+    if grep -sqe "^i2c $1" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+eisa () {
+    if grep -sqe "^eisa $1" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+bcma () {
+    if grep -sqe "^bcma $1 $2 $3 $4" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+input () {
+    if grep -sqe "^input $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+i2c-snd () {
+    if grep -sqe "^i2c-snd $1" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+parisc () {
+    if grep -sqe "^parisc $1 $2 $3 $4" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+pcmcia () {
+    if grep -sqe "^pcmcia $1 $2 $3 $4 $5 $6 $7 $8 $9" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+of () {
+    if grep -sqe "^of $1 $2 $3" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+spi () {
+    if grep -sqe "^spi $1" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+vio () {
+    if grep -sqe "^vio $1 $2" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+virtio () {
+    if grep -sqe "^virtio $1 $2" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+ssb () {
+    if grep -sqe "^ssb $1 $2 $3" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+sdio () {
+    if grep -sqe "^sdio $1 $2 $3" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+tc () {
+    if grep -sqe "^tc $1 $2" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+zorro () {
+    if grep -sqe "^zorro $1 $2" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+kver () {
+    echo "kver is unsupported, yet"
+}
+
 pci () {
     if grep -sqe "^pci $1 $2 $3 $4 $5" $AUTO_KAC ; then
 	found "$@"
+    fi
+}
+
+pci_epf () {
+    if grep -sqe "^pci_epf $1" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+rpmsg () {
+    if grep -sqe "^rpmsg $1" $AUTO_KAC ; then
+        found "$@"
+    fi
+}
+
+slim () {
+    if grep -sqe "^slim $1 $2 $3 $4" $AUTO_KAC ; then
+        found "$@"
     fi
 }
 

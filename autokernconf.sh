@@ -360,6 +360,10 @@ serio () {
 }
 
 platform () {
+    # skip empty string
+    if [ -z "$1" ] ; then
+        return
+    fi
     if grep -sqe  "^platform $1" $AUTO_KAC ; then
         found "$@"
     fi

@@ -282,7 +282,8 @@ zorro () {
 }
 
 kver () {
-    echo "kver is unsupported, yet"
+    # silently ignore
+    return
 }
 
 pci () {

@@ -20,18 +20,20 @@ This is free software, see GNU General Public License v2 for details.
 This script tries to autoconfigure the Linux kernel, detecting the hardware (devices, ...) and software (protocols, filesystems, ...).
 It uses soft detections: no direct IO access to unknow devices, thus it is always safe to run this script and it never hangs, but it cannot detect all hardware (mainly some very old hardware).
 
+**Expect some false positives**
+
 Report errors, bugs, additions, wishes and comments <cate@debian.org>.
 
 
 # Usage
 ```
-# run on target system to generate a list of detected hardware:
+# run on target system to generate a list of detected hardware (kdetect.list):
 ./kdetect.sh
 # run to download lkddb and match found hardware with kernel CONFIG_ options
 ./autokernconf.sh
 ```
 
-Then merge *config.auto* into your minimal/current/default kernel config.
+Then merge the generated *config.auto* into your minimal/current/default kernel config.
 
 General Hints:
 * you don't need super user privileges.

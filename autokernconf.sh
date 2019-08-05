@@ -180,6 +180,16 @@ is_mid () {
     [ $( (echo "$1"; echo "$2"; echo "$3") | sort -n | head -2 | tail -1 ) = "$2" ]
 }
 
+# check whether argument consists only of "."
+is_all_wildcard () {
+    [ "$(echo $@ | sed 's| ||g ; s|\.\.*|\.|g')" == "." ]
+}
+
+# check whether argument is empty an string
+is_empty () {
+    [ -z "$1" ]
+}
+
 # enable PCI support if pci devices were detected
 if grep -sqi '^pci [0-9]' $AUTO_KAC; then
     provide CONFIG_PCI
@@ -197,102 +207,123 @@ parse_kdetect_list () {
 
 # bus specific device matching
 hid () {
+    is_all_wildcard "$1" "$2" "$3" && return
     if grep -sqe "^hid $1 $2 $3" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 hda () {
+    is_all_wildcard "$1" "$2" && return
     if grep -sqe "^hda $1 $2" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 i2c () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^i2c $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 eisa () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^eisa $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 bcma () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     if grep -sqe "^bcma $1 $2 $3 $4" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 input () {
+    is_all_wildcard "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" "$10" "$11" "$12" "$13" && return
     if grep -sqe "^input $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 i2c-snd () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^i2c-snd $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 parisc () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     if grep -sqe "^parisc $1 $2 $3 $4" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 pcmcia () {
+    is_all_wildcard "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" && return
     if grep -sqe "^pcmcia $1 $2 $3 $4 $5 $6 $7 $8 $9" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 of () {
+    is_all_wildcard "$1" "$2" "$3" && return
     if grep -sqe "^of $1 $2 $3" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 spi () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^spi $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 vio () {
+    is_all_wildcard "$1" "$2" && return
     if grep -sqe "^vio $1 $2" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 virtio () {
+    is_all_wildcard "$1" "$2"&& return
     if grep -sqe "^virtio $1 $2" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 ssb () {
+    is_all_wildcard "$1" "$2" "$3" && return
     if grep -sqe "^ssb $1 $2 $3" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 sdio () {
+    is_all_wildcard "$1" "$2" "$3" && return
     if grep -sqe "^sdio $1 $2 $3" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 tc () {
+    is_all_wildcard "$1" "$2" && return
     if grep -sqe "^tc $1 $2" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 zorro () {
+    is_all_wildcard "$1" "$2" && return
     if grep -sqe "^zorro $1 $2" $AUTO_KAC ; then
         found "$@"
     fi
@@ -304,30 +335,37 @@ kver () {
 }
 
 pci () {
+    is_all_wildcard "$1" "$2" "$3" "$4" "$5" && return
     if grep -sqe "^pci $1 $2 $3 $4 $5" $AUTO_KAC ; then
     found "$@"
     fi
 }
 
 pci_epf () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^pci_epf $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 rpmsg () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^rpmsg $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 slim () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     if grep -sqe "^slim $1 $2 $3 $4" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 usb () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     line=$(grep -oe "^usb $1 $2 $3 $4" $AUTO_KAC )
     if [ -n "$line" ] ; then
         bcd=$(echo "$line" | grep -o '....$' )
@@ -342,48 +380,61 @@ usb () {
 }
 
 ieee1394 () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     if grep -sqe "^ieee1394 $1 $2 $3 $4" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 ccw () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     if grep -sqe "^ccw $1 $2 $3 $4" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 ap () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe "^ap $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 acpi () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe  "^acpi $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 pnp () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe  "^pnp $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 serio () {
+    is_all_wildcard "$1" "$2" "$3" "$4" && return
     if grep -sqe  "^serio $1 $2 $3 $4" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 platform () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe  "^platform $1" $AUTO_KAC ; then
         found "$@"
     fi
 }
 
 fs () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe  "^fs $1" $AUTO_KAC ; then
         found "$@"
     fi
@@ -391,6 +442,8 @@ fs () {
 
 
 module () {
+    is_empty "$1" && return
+    is_all_wildcard "$1" && return
     if grep -sqe  "^module $1" $AUTO_KAC ; then
         found "$@"
     fi

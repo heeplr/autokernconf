@@ -22,7 +22,7 @@
 # detect all hardware (mainly some very old hardware).
 #
 # Report errors, bugs, additions, wishes and comments <cate@debian.org>.
-# 
+#
 # Usage:
 #   General Hints:
 #     you don't need super user privileges.
@@ -57,23 +57,28 @@ LANG=C
 
 Null=/dev/null
 
+# check if kdetect.list file has been generated, yet
 if ! [ -f "$AUTO_KAC" ] ; then
     echo "$AUTO_KAC not found. please run ./kdetect.sh first."
     exit 1
 fi
 
+# check if lkddb.list file is available
 if ! [ -f lkddb.list ] ; then
     echo "lkddb.list not found"
-    # try to download
+    # try to download if not
     if [ -n "$(which wget)" ] ; then
         wget "$LKDDB_URL" || exit 1
     elif [ -n "$(which curl)" ] ; then
         curl -O "$LKDDB_URL" || exit 1
     else
+        # we can't work without the database
+        echo "Please download $LKDDB_URL"
         exit 1
     fi
 fi
 
+# start a new config.auto
 echo "#" > $CONF_AUTO
 echo "# Automagically generated file. Do not edit!" >> $CONF_AUTO
 echo "# (autoprobe v1.5)" >> $CONF_AUTO
@@ -89,7 +94,7 @@ echo "#" >> $CONF_AUTO
 #
 comment() {
     if [ "$PROVIDE_DEBUG" = "y" ]; then
-	echo "# --- $@ ---" >> $CONF_AUTO
+        echo "# --- $@ ---" >> $CONF_AUTO
     fi
     echo "$@"
 }
@@ -128,36 +133,41 @@ raw_found () {
     define "CONFIG_$1" y
 }
 
+# enable all CONFIG_ entries from matching database entry
 found () {
     for conf in $(echo "$@" | sed -ne 's/^.*[ \t]*:\(.*\)*[ \t]*:.*$/\1/p' - ) ; do
         if [ "$conf" == "CONFIG__UNKNOW__" ]; then
             echo "# $@" >> $CONF_AUTO
-	elif [ "$(eval echo \$$conf)" != "y" ]; then
-	    define "$conf" y
+        elif [ "$(eval echo \$$conf)" != "y" ]; then
+            define "$conf" y
         fi
     done
 }
+
 found_y () {
     for conf in "$@" ; do
-    	if [ "$(eval echo \$$conf)" != "y" ]; then
-	    define "$conf" y
-    	fi
+        if [ "$(eval echo \$$conf)" != "y" ]; then
+            define "$conf" y
+        fi
     done
 }
+
 found_m () {
     for conf in "$@" ; do
-    	if [ "$(eval echo \$$conf)" != "y"  -a  "$(eval echo \$$conf)" != "m" ]; then
-	    define "$conf" m
-    	fi
+        if [ "$(eval echo \$$conf)" != "y"  -a  "$(eval echo \$$conf)" != "m" ]; then
+            define "$conf" m
+        fi
     done
 }
+
 found_n () {
     for conf in "$@" ; do
-    	if [ -z "$(eval echo \$$conf)" ]; then
-	    define "$conf" n
-    	fi
+        if [ -z "$(eval echo \$$conf)" ]; then
+            define "$conf" n
+        fi
     done
 }
+
 provide () {
     if [ "$(eval echo \$PROVIDE_$1)" != "y" ]; then
         eval "PROVIDE_$1=y"
@@ -170,15 +180,22 @@ is_mid () {
     [ $( (echo "$1"; echo "$2"; echo "$3") | sort -n | head -2 | tail -1 ) = "$2" ]
 }
 
-
-#--- Parse "autoconfig.rules" ---#
-
-
+# enable PCI support if pci devices were detected
 if grep -sqi '^pci [0-9]' $AUTO_KAC; then
     provide CONFIG_PCI
     found CONFIG_PCI
 fi
 
+# parse kdetect.list
+parse_kdetect_list () {
+    for conf in $(grep "^config " $AUTO_KAC ) ; do
+        if [ "$conf" != "config" ] ; then
+            raw_found $conf
+        fi
+    done
+}
+
+# bus specific device matching
 hid () {
     if grep -sqe "^hid $1 $2 $3" $AUTO_KAC ; then
         found "$@"
@@ -288,7 +305,7 @@ kver () {
 
 pci () {
     if grep -sqe "^pci $1 $2 $3 $4 $5" $AUTO_KAC ; then
-	found "$@"
+    found "$@"
     fi
 }
 
@@ -313,14 +330,14 @@ slim () {
 usb () {
     line=$(grep -oe "^usb $1 $2 $3 $4" $AUTO_KAC )
     if [ -n "$line" ] ; then
-	bcd=$(echo "$line" | grep -o '....$' )
-	if [ "$bcd" = "...." ] ; then
-	    found "$@"
-	else
-	    if is_mid "$bcd" "$5" "$6" ; then
-	        found "$@"
-	    fi
-	fi
+        bcd=$(echo "$line" | grep -o '....$' )
+        if [ "$bcd" = "...." ] ; then
+            found "$@"
+        else
+            if is_mid "$bcd" "$5" "$6" ; then
+                found "$@"
+            fi
+        fi
     fi
 }
 
@@ -361,10 +378,6 @@ serio () {
 }
 
 platform () {
-    # skip empty string
-    if [ -z "$1" ] ; then
-        return
-    fi
     if grep -sqe  "^platform $1" $AUTO_KAC ; then
         found "$@"
     fi
@@ -383,31 +396,21 @@ module () {
     fi
 }
 
-# ----
-parse_kdetect_list () {
-    for conf in $(grep "^config " $AUTO_KAC ) ; do
-	if [ "$conf" != "config" ] ; then
-	    raw_found $conf
-	fi
-    done	    
-}
-
-
 
 #----------#
 
 lkddb () {
-   [ "$1" = "pci"       ] && ( shift; pci	"$@" ; return )
+   [ "$1" = "pci"       ] && ( shift; pci       "$@" ; return )
    [ "$1" = "pci_epf"   ] && ( shift; pci_epf   "$@" ; return )
-   [ "$1" = "usb"       ] && ( shift; usb	"$@" ; return )
-   [ "$1" = "ieee1394"  ] && ( shift; ieee1394	"$@" ; return )
-   [ "$1" = "ccw"       ] && ( shift; ccw	"$@" ; return )
-   [ "$1" = "ap"   	] && ( shift; ap 	"$@" ; return )
-   [ "$1" = "acpi" 	] && ( shift; acpi 	"$@" ; return )
-   [ "$1" = "pnp"  	] && ( shift; pnp 	"$@" ; return )
-   [ "$1" = "serio" 	] && ( shift; serio 	"$@" ; return )
+   [ "$1" = "usb"       ] && ( shift; usb       "$@" ; return )
+   [ "$1" = "ieee1394"  ] && ( shift; ieee1394  "$@" ; return )
+   [ "$1" = "ccw"       ] && ( shift; ccw       "$@" ; return )
+   [ "$1" = "ap"        ] && ( shift; ap        "$@" ; return )
+   [ "$1" = "acpi"      ] && ( shift; acpi      "$@" ; return )
+   [ "$1" = "pnp"       ] && ( shift; pnp       "$@" ; return )
+   [ "$1" = "serio"     ] && ( shift; serio     "$@" ; return )
    [ "$1" = "platform"  ] && ( shift; platform  "$@" ; return )
-   [ "$1" = "fs"   	] && ( shift; fs 	"$@" ; return )
+   [ "$1" = "fs"        ] && ( shift; fs        "$@" ; return )
    [ "$1" = "module"    ] && ( shift; module    "$@" ; return )
    [ "$1" = "hid"       ] && ( shift; hid       "$@" ; return )
    [ "$1" = "hda"       ] && ( shift; hda       "$@" ; return )

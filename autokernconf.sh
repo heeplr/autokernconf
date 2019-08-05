@@ -69,6 +69,8 @@ if ! [ -f lkddb.list ] ; then
         wget "$LKDDB_URL" || exit 1
     elif [ -n "$(which curl)" ] ; then
         curl -O "$LKDDB_URL" || exit 1
+    else
+        exit 1
     fi
 fi
 

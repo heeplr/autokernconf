@@ -127,7 +127,7 @@ raw_found () {
 }
 
 found () {
-    for conf in $(echo "$@" | sed -ne 's/^.*:[ \t]*\(.*\)*[ \t]*:.*$/\1/p' - ) ; do
+    for conf in $(echo "$@" | sed -ne 's/^.*[ \t]*:\(.*\)*[ \t]*:.*$/\1/p' - ) ; do
         if [ "$conf" == "CONFIG__UNKNOW__" ]; then
             echo "# $@" >> $CONF_AUTO
 	elif [ "$(eval echo \$$conf)" != "y" ]; then

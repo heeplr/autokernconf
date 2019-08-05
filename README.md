@@ -28,6 +28,15 @@ General Hints:
 * you don't need super user privileges.
 * you can run this script on a target machine without the need of the kernel sources.
 
+```
+# run on target system to generate a list of detected hardware:
+./kdetect.sh
+# run to download lkddb and match found hardware with kernel CONFIG_ options
+./autokernconf.sh
+```
+
+Then merge *config.auto* into your minimal/current/default kernel config.
+
 
 # Developing
 There are a lots of redundance: because user maybe has not already installed the drivers (thus we use smart detection on PCI, USB,..)

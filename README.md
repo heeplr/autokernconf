@@ -24,10 +24,6 @@ Report errors, bugs, additions, wishes and comments <cate@debian.org>.
 
 
 # Usage
-General Hints:
-* you don't need super user privileges.
-* you can run this script on a target machine without the need of the kernel sources.
-
 ```
 # run on target system to generate a list of detected hardware:
 ./kdetect.sh
@@ -36,6 +32,10 @@ General Hints:
 ```
 
 Then merge *config.auto* into your minimal/current/default kernel config.
+
+General Hints:
+* you don't need super user privileges.
+* you can run this script on a target machine without the need of the kernel sources.
 
 
 # Developing
